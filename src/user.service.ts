@@ -34,3 +34,7 @@ export const update = (user: User, updates: UpdateUser): User => {
 
   return updatedUser;
 };
+
+export const deleteUser = (user: User): void => {
+  userStore = userStore.filter((i) => i.id !== user.id);
+};

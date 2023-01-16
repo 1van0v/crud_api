@@ -113,3 +113,11 @@ export const updateUser = async (
 
   sendJson(res, { data: updatedUser });
 };
+
+export const deleteUser = (req: IncomingMessage, res: ServerResponse): void => {
+  const user = findOrThrow(req.url);
+  userService.deleteUser(user);
+
+  res.statusCode = 204;
+  res.end();
+};

@@ -18,6 +18,8 @@ export const server = http.createServer(
           return userController.getUserById(req, res);
         } else if (req.method === 'PUT') {
           return await userController.updateUser(req, res);
+        } else if (req.method === 'DELETE') {
+          return userController.deleteUser(req, res);
         }
       }
       
