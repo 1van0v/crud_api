@@ -1,5 +1,5 @@
 import { BadRequest } from './errors';
-import { CreateUser, UpdateUser } from './user.model';
+import { CreateUser, UpdateUser } from './models/user.model';
 
 type RequiredProps = keyof CreateUser;
 

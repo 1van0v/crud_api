@@ -2,7 +2,7 @@ import * as uuid from 'uuid';
 
 import { IncomingMessage, ServerResponse, STATUS_CODES } from 'http';
 import { BadRequest, CustomError, NotFound } from './errors';
-import { CreateUser, UpdateUser, User } from './user.model';
+import { CreateUser, UpdateUser, User } from './models/user.model';
 import * as userService from './user.service';
 import * as userValidator from './user.validator';
 
@@ -89,7 +89,7 @@ export const createUser = async (
 ): Promise<void> => {
   const newUser = await readJson<CreateUser>(req);
   userValidator.canCreate(newUser);
-  const createdUser = userService.addUser(newUser);
+  const createdUser = await userService.addUser(newUser);
   sendJson(res, { statusCode: 201, data: createdUser });
 };
 
@@ -109,7 +109,7 @@ export const updateUser = async (
   const user = findOrThrow(req.url);
   const updates = await readJson<UpdateUser>(req);
   userValidator.canUpdate(updates);
-  const updatedUser = userService.update(user, updates);
+  const updatedUser = await userService.update(user, updates);
 
   sendJson(res, { data: updatedUser });
 };
