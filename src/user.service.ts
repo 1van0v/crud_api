@@ -1,14 +1,16 @@
 import { v4 as uuid } from 'uuid';
 
-import { User } from "./user.model";
+import { CreateUser, User } from "./user.model";
 
 const userStore: User[] = [];
 
 export const getUsers = (): User[] => userStore;
 
-export const addUser = (userToCreate: Omit<User, 'id'>) => {
-  userStore.push({
+export const addUser = (userToCreate: CreateUser): User => {
+  const newUser = {
     ...userToCreate,
     id: uuid()
-  })
+  };
+  userStore.push(newUser);
+  return newUser;
 }

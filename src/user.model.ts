@@ -1,6 +1,8 @@
 export interface User {
   hobbies: string[];
   age: number;
-  name: string;
+  username: string;
   id: string;
 }
+
+export type CreateUser = Omit<User, 'id'>
