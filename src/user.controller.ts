@@ -2,14 +2,14 @@ import * as uuid from 'uuid';
 
 import { IncomingMessage, ServerResponse, STATUS_CODES } from 'http';
 import { BadRequest, CustomError, NotFound } from './errors';
-import { CreateUser, User } from './user.model';
+import { CreateUser, UpdateUser, User } from './user.model';
 import * as userService from './user.service';
 import * as userValidator from './user.validator';
 
-const parseUuid = (url: string): string => {
+const parseUuid = (url?: string): string => {
   const requestedUuid =
     url
-      .split('/')
+      ?.split('/')
       .reverse()
       .find((i) => i !== 'a') || '';
 
@@ -65,7 +65,8 @@ const readJson = <T>(req: IncomingMessage): Promise<T> => {
   });
 };
 
-const findOrThrow = (id: string): User => {
+const findOrThrow = (url?: string): User => {
+  const id = parseUuid(url);
   const user = userService.find(id);
 
   if (!user) {
@@ -86,7 +87,7 @@ export const createUser = async (
   req: IncomingMessage,
   res: ServerResponse
 ): Promise<void> => {
-  const newUser = (await readJson(req)) as CreateUser;
+  const newUser = await readJson<CreateUser>(req);
   userValidator.canCreate(newUser);
   const createdUser = userService.addUser(newUser);
   sendJson(res, { statusCode: 201, data: createdUser });
@@ -96,8 +97,19 @@ export const getUserById = (
   req: IncomingMessage,
   res: ServerResponse
 ): void => {
-  const userId = parseUuid(req.url || '');
-  const data = findOrThrow(userId);
+  const data = findOrThrow(req.url);
 
   sendJson(res, { data });
+};
+
+export const updateUser = async (
+  req: IncomingMessage,
+  res: ServerResponse
+): Promise<void> => {
+  const user = findOrThrow(req.url);
+  const updates = await readJson<UpdateUser>(req);
+  userValidator.canUpdate(updates);
+  const updatedUser = userService.update(user, updates);
+
+  sendJson(res, { data: updatedUser });
 };

@@ -1,5 +1,5 @@
 import { BadRequest } from './errors';
-import { CreateUser } from './user.model';
+import { CreateUser, UpdateUser } from './user.model';
 
 type RequiredProps = keyof CreateUser;
 
@@ -35,7 +35,19 @@ export const canCreate = (user: CreateUser): void => {
       : prop + ' is required';
 
     if (validationResult) {
-      throw new BadRequest(prop + ' is required');
+      throw new BadRequest(validationResult);
+    }
+  }
+};
+
+export const canUpdate = (updates: UpdateUser): void => {
+  const updatedProps = Object.keys(updates) as Array<RequiredProps>;
+
+  for (const prop of updatedProps) {
+    const validationResult = validationModel[prop]?.(updates[prop]);
+
+    if (validationResult) {
+      throw new BadRequest(validationResult);
     }
   }
 };

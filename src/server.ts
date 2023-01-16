@@ -16,6 +16,8 @@ export const server = http.createServer(
       }  else if (/\/api\/users\/\w/.test(req.url || '')) {
         if (req.method === 'GET') {
           return userController.getUserById(req, res);
+        } else if (req.method === 'PUT') {
+          return await userController.updateUser(req, res);
         }
       }
       
