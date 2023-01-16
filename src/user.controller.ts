@@ -1,9 +1,24 @@
-import { IncomingMessage, ServerResponse, STATUS_CODES } from 'http';
-import { CustomError } from './errors';
-import { CreateUser } from './user.model';
+import * as uuid from 'uuid';
 
+import { IncomingMessage, ServerResponse, STATUS_CODES } from 'http';
+import { BadRequest, CustomError, NotFound } from './errors';
+import { CreateUser, User } from './user.model';
 import * as userService from './user.service';
 import * as userValidator from './user.validator';
+
+const parseUuid = (url: string): string => {
+  const requestedUuid =
+    url
+      .split('/')
+      .reverse()
+      .find((i) => i !== 'a') || '';
+
+  if (!uuid.validate(requestedUuid)) {
+    throw new BadRequest('uuid is invalid');
+  }
+
+  return requestedUuid;
+};
 
 export const sendJson = (
   res: ServerResponse,
@@ -50,6 +65,16 @@ const readJson = <T>(req: IncomingMessage): Promise<T> => {
   });
 };
 
+const findOrThrow = (id: string): User => {
+  const user = userService.find(id);
+
+  if (!user) {
+    throw new NotFound(`User with id = ${id} does not exist`);
+  }
+
+  return user;
+};
+
 export const getAllUsers = (
   req: IncomingMessage,
   res: ServerResponse
@@ -65,4 +90,14 @@ export const createUser = async (
   userValidator.canCreate(newUser);
   const createdUser = userService.addUser(newUser);
   sendJson(res, { statusCode: 201, data: createdUser });
+};
+
+export const getUserById = (
+  req: IncomingMessage,
+  res: ServerResponse
+): void => {
+  const userId = parseUuid(req.url || '');
+  const data = findOrThrow(userId);
+
+  sendJson(res, { data });
 };

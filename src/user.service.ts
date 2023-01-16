@@ -14,3 +14,7 @@ export const addUser = (userToCreate: CreateUser): User => {
   userStore.push(newUser);
   return newUser;
 }
+
+export const find = (uuid: string): User | undefined => {
+  return userStore.find(i => i.id === uuid);
+}
